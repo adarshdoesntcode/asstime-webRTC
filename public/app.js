@@ -9,7 +9,8 @@ let myPeer = new Peer(undefined,{
 const myVideo = document.createElement('video')
 myVideo.muted = true
 const peers ={}
-
+if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+  navigator.msGetUserMedia) {
 navigator.mediaDevices.getUserMedia({
   video: true,
   audio: true
@@ -28,7 +29,9 @@ navigator.mediaDevices.getUserMedia({
     connectToNewUser(userId, stream)
   })
 })
-
+}else{
+  alert("can't render video.")
+}
 socket.on('user-disconnected', userId => {
   if (peers[userId]) peers[userId].close()
 })
