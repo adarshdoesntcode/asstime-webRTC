@@ -8,6 +8,10 @@ let myPeer = new Peer(undefined,{
 
 const myVideo = document.createElement('video')
 myVideo.muted = true
+myVideo.autoplay =true
+myVideo.playsInline = true
+myVideo.setAttribute('webkit-playsinline', 'webkit-playsinline')
+
 const peers ={}
 if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
   navigator.msGetUserMedia) {
