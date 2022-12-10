@@ -24,7 +24,6 @@ navigator.mediaDevices.getUserMedia({
   myPeer.on('call', call => {
     call.answer(stream)
     const video = document.createElement('video')
-    video.muted = true
     video.autoplay =true
     video.playsInline = true
     video.setAttribute('webkit-playsinline', 'webkit-playsinline')
