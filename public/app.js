@@ -8,25 +8,18 @@ let myPeer = new Peer(undefined,{
 
 const myVideo = document.createElement('video')
 myVideo.muted = true
-myVideo.autoplay =true
-myVideo.playsInline = true
-myVideo.setAttribute('webkit-playsinline', 'webkit-playsinline')
 
 const peers ={}
-if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
-  navigator.msGetUserMedia) {
-navigator.mediaDevices.getUserMedia({
-  video: true,
-  audio: true
+if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia) {
+  navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true
 }).then(stream => {
   addVideoStream(myVideo, stream)
 
   myPeer.on('call', call => {
     call.answer(stream)
     const video = document.createElement('video')
-    video.autoplay =true
-    video.playsInline = true
-    video.setAttribute('webkit-playsinline', 'webkit-playsinline')
     call.on('stream', userVideoStream => {
       addVideoStream(video, userVideoStream)
     })
@@ -39,6 +32,7 @@ navigator.mediaDevices.getUserMedia({
 }else{
   alert("can't render video.")
 }
+
 socket.on('user-disconnected', userId => {
   if (peers[userId]) peers[userId].close()
 })
@@ -61,6 +55,9 @@ function connectToNewUser(userId, stream) {
 }
 
 function addVideoStream(video, stream) {
+  video.autoplay =true
+  video.playsInline = true
+  video.setAttribute('webkit-playsinline', 'webkit-playsinline')
   video.srcObject = stream
   video.addEventListener('loadedmetadata', () => {
     video.play()
