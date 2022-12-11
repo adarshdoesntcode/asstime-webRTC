@@ -26,17 +26,17 @@
       margin-left: 20px;
     }
   </style>
-  <script>
-    ROOM_ID = '<%= roomID %>'
-  </script>
-<script defer src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
-  <script defer src="/socket.io/socket.io.js"></script>
-  <script defer  src="app.js"></script>
 </head>
 <body>
   <h2>Asstime v0.01 🍑</h2>
   <div id="video-container">
     
   </div>
+    <script>
+    ROOM_ID = '<%= roomID %>'
+  </script>
+<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
