@@ -4,39 +4,34 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="shortcut icon" href="/peach.png" type="image/x-icon">
-  <title>Asstime v0.02</title>
-  <style>
-    #video-container{
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    video{
-      border-radius: 5px;
-      margin: 15px;
-      width: 600px;
-      height: 400px;
-      object-fit: cover;
-      transform: scaleX(-1);
-      box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-    }
-    h2{
-      margin-left: 20px;
-    }
-  </style>
+  <link rel="shortcut icon" href="assets/peach.png" type="image/x-icon">
+  <title>asstime v0.0.3</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <h2>Asstime v0.02 🍑</h2>
+  <h3>🍑 asstime v0.0.3</h3>
   <div id="video-container">
-    
+    <div class="localVideo">
+      <video class="localVideoPlayer" autoplay playsinline muted></video>
+    </div>
   </div>
-    <script>
-    ROOM_ID = '<%= roomID %>'
+  <div class="controls">
+    <i class="fa-solid fa-microphone active"></i>
+    <p>mic</p>
+    <i class="fa-solid fa-video active"></i>
+    <p>video</p>
+    <i class="fa-solid fa-tv"></i>
+    <p>screen</p>
+    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+    <p>leave</p>
+
+  </div>
+  <script>
+    const roomId = '<%=roomId%>'
+    const displayName = prompt('your boring name !!')
   </script>
-  <!-- <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script> -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="app.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>

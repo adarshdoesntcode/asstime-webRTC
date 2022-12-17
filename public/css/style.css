@@ -1,0 +1,89 @@
+*{
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  color: grey;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body{
+  position: relative;
+}
+
+#video-container{
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  /* max-width: 960px; */
+  position: relative;
+}
+
+
+h3{
+  margin-top: 1.4rem;
+}
+
+p{
+  margin-top: 0.6rem;
+  margin-bottom: 0;
+}
+
+.red{
+  color: rgb(196, 41, 41);
+}
+
+.remoteVideoPlayer{
+  border-radius: 0.8rem;
+  margin: 1.4rem 1.4rem 0 0;
+  width: 34vw;
+  height: 37vh;
+  object-fit: cover;
+  transform: scaleX(-1);
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.localVideo{
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  
+}
+
+.localVideoPlayer{
+  border-radius: 0.8rem;
+  width: 25vw;
+  height: 25vh;
+  object-fit: cover;
+  transform: scaleX(-1);
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.controls{
+  display: flex;
+  font-size: 2rem;
+  flex-direction: column;
+  position: fixed;
+  right: 0;
+  bottom: 50%;
+  /* width: 5%; */
+}
+
+.controls i {
+  padding-right: 0.7rem;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.active{
+  color: rgb(69, 190, 69);
+}
+.fa-arrow-right-from-bracket:hover{
+  color: red;
+}
+.controls p {
+  font-size: 0.8rem;
+  padding-bottom: 1rem;
+  padding-right: 0.7rem;
+
+}
