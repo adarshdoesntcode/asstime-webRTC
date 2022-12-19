@@ -280,14 +280,14 @@ const videoProcess = async (newVideoState) => {
 
 };
 
-const updateMediaSenders = async (tracks, rtp_senders) => {
+const updateMediaSenders = async (track, rtp_senders) => {
   try {
     for (let id in peers_Connection) {
       if (checkConnection(peers_Connection[id])) {
         if (rtp_senders[id] && rtp_senders[id].track) {
-          rtp_senders[id].replaceTrack(tracks);
+          rtp_senders[id].replaceTrack(track);
         } else {
-          rtp_senders[id] = peers_Connection[id].addTrack(tracks)
+          rtp_senders[id] = peers_Connection[id].addTrack(track)
         }
       }
     }
