@@ -47,6 +47,7 @@ p{
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
+  z-index: 500;
  
   
 }
@@ -58,7 +59,7 @@ p{
   object-fit: cover;
   transform: scaleX(-1);
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-  z-index: 500;
+  /* z-index: 500; */
 }
 
 .controls{
