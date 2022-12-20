@@ -187,7 +187,6 @@ const createConnection = async (connectId) => {
 
     if (videoState == videoStates.Camera || videoState == videoStates.Screen) {
       if (webcamTracks) {
-        console.log("added to track");
         updateMediaSenders(webcamTracks, rtp_video_senders);
       }
     }
@@ -230,16 +229,16 @@ const clientProcess = async (message, from_connectId) => {
         peers_Connection[from_connectId].setRemoteDescription(message.answer)
       }
     } else if (message.offer) { //OFFER
-      if(!peers_Connection[from_connectId]){
-        await createConnection(from_connectId)
-      }
+      // if(!peers_Connection[from_connectId]){
+      //   await createConnection(from_connectId)
+      // }
 
       await peers_Connection[from_connectId].setRemoteDescription(
         message.offer
       );
-      if (!peers_Connection[from_connectId]) {
-        await createConnection(from_connectId);
-      }
+      // if (!peers_Connection[from_connectId]) {
+      //   await createConnection(from_connectId);
+      // }
       const answer = await peers_Connection[from_connectId].createAnswer();
       await peers_Connection[from_connectId].setLocalDescription(answer);
 
@@ -250,9 +249,9 @@ const clientProcess = async (message, from_connectId) => {
         from_connectId
       );
     } else if (message.icecandidate) { //ICECANDIDATE
-      if (!peers_Connection[from_connectId]) {
-        await createConnection(from_connectId);
-      }
+      // if (!peers_Connection[from_connectId]) {
+      //   await createConnection(from_connectId);
+      // }
       try {
         peers_Connection[from_connectId].addIceCandidate(message.icecandidate);
       } catch (error) {
