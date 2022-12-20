@@ -36,8 +36,8 @@ p{
 .remoteVideoPlayer{
   border-radius: 0.8rem;
   margin: 1.4rem 1.4rem 0 0;
-  width: 34vw;
-  height: 37vh;
+  width: 40vw;
+  height: 40vh;
   object-fit: cover;
   transform: scaleX(-1);
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -47,17 +47,18 @@ p{
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
-  z-index: 9999999999999999999;
+ 
   
 }
 
 .localVideoPlayer{
   border-radius: 0.8rem;
-  width: 25vw;
-  height: 25vh;
+  width: 30vw;
+  height: 30vh;
   object-fit: cover;
   transform: scaleX(-1);
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  z-index: 9999999999999999999;
 }
 
 .controls{
@@ -87,4 +88,16 @@ p{
   padding-bottom: 1rem;
   padding-right: 0.7rem;
 
+}
+
+@media screen and (max-width: 700px) {
+  .remoteVideoPlayer{
+    border-radius: 0.8rem;
+    margin: 1.4rem 1.4rem 0 0;
+    width: 85vw;
+    height: 70vh;
+    object-fit: cover;
+    transform: scaleX(-1);
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  }
 }
