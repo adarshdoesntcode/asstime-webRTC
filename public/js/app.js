@@ -21,83 +21,88 @@ const ICE = {
       credential: "LMuAOvhUOAIGDOdt",
     },
 ]
-};
+}
 
-let peerConnection;
-let webcamTracks;
-let peers_ConnectionIds = [];
-let peers_Connection = [];
-let remoteVidStream = [];
-let remoteAudStream = [];
-let rtp_video_senders = [];
-let rtp_audio_senders = [];
-let audio;
-let muted = true;
+let socket = null
+let webcamTracks
+let peers_ConnectionIds = []
+let peers_Connection = []
+let remoteVidStream = []
+let remoteAudStream = []
+let rtp_video_senders = []
+let rtp_audio_senders = []
+let audio
+let muted = true
 
 const localVideoPlayer = document.querySelector(".localVideoPlayer");
 const videoContainer = document.querySelector("#video-container");
 
 const videoStates = { None: 0, Camera: 1, Screen: 2 };
-let videoState = videoStates.None;
+let videoState = videoStates.None
 
 // =======================================================================================
 
-
 // ==================================SOCKET IO============================================
-
-const socket = io.connect();
-
-socket.on("connect", () => {
-  socket.emit("userconnect", {
-    displayName,
-    roomId,
-  })
-})
-
-socket.on("inform_others_about_me", async (data) => {
-  try {
-    await createConnection(data.connectId)
-    addPeer(data.displayName, data.connectId)
-  } catch (error) {
-    console.log(error)
-  }
-})
-
-socket.on("inform_me_about_others", async (otherPeers) => {
-  try {
-    if (otherPeers) {
-      for (let i = 0; i < otherPeers.length; i++) {
-        await createConnection(otherPeers[i].connectId)
-        addPeer(otherPeers[i].displayName, otherPeers[i].connectId)
+const init = ()=>{
+  socket = io.connect()
+ 
+  socket.on("connect", () => {
+    if(socket.connected){
+      if(displayName != "" && roomId != ""){
+        socket.emit("userconnect", {
+          displayName,
+          roomId,
+        })
       }
     }
-  } catch (error) {
-    console.log(error);
-  }
-})
+  })
 
+  socket.on("inform_others_about_me", async (data) => {
+    try {
+      addPeer(data.displayName, data.connectId)
+      await createConnection(data.connectId)
+    } catch (error) {
+      console.log(error)
+    }
+  })
 
-//-----"RECEIVE"  answer||offer||ICE from the server-------
+  socket.on("inform_me_about_others", async (otherPeers) => {
+    try {
+      if (otherPeers) {
+        for (let i = 0; i < otherPeers.length; i++) {
+          addPeer(otherPeers[i].displayName, otherPeers[i].connectId)
+          await createConnection(otherPeers[i].connectId)
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  })
+  
+  //-----"RECEIVE"  answer||offer||ICE from the server-------
 
-socket.on("SDP_Process", async (data) => {
-  try {
-    await clientProcess(data.message, data.from_connectId);
-  } catch (error) {
-    console.log(error);
-  }
-})
+  socket.on("SDP_Process", async (data) => {
+    try {
+      await clientProcess(data.message, data.from_connectId);
+    } catch (error) {
+      console.log(error);
+    }
+  })
+}
+
+init()
 
 // ========================================================================================
 
 
-//-----"SEND"  answer||offer||ICE to the server-------
+  //-----"SEND"  answer||offer||ICE to the server-------
 
-const serverProcess = (data, to_connectId) => {
-  socket.emit("SDP_Process", {
-    message: data,
-    to_connectId,
-  });
-};
+  const serverProcess = (data, to_connectId) => {
+    socket.emit("SDP_Process", {
+      message: data,
+      to_connectId,
+    });
+  };
 
 
 //-------------Add new Peer to the DOM----------
@@ -114,7 +119,7 @@ const addPeer = (displayName, connectId) => {
     document.getElementById(`v_${connectId}`).requestFullscreen();
   });
 };
-
+ 
 // ==================================PEER CONNECTION============================================
 
 
@@ -122,10 +127,11 @@ const addPeer = (displayName, connectId) => {
 
 const createConnection = async (connectId) => {
   try {
-    peerConnection = new RTCPeerConnection(ICE);
+    let peerConnection = new RTCPeerConnection(ICE);
+
 
     peerConnection.onnegotiationneeded = async (event) => {
-      await createOffer(connectId);
+      await createOffer(connectId)
     }
 
     peerConnection.onicecandidate = (event) => {
@@ -139,9 +145,12 @@ const createConnection = async (connectId) => {
       }
     };
 
+
+
     //-------------"RECEIVE" remote VIDEO from other Peers----------
 
     peerConnection.ontrack = (event) => {
+      console.log(event);
       if (!remoteVidStream[connectId]) {
         remoteVidStream[connectId] = new MediaStream();
       }
@@ -173,17 +182,17 @@ const createConnection = async (connectId) => {
       }
     };
 
+    peers_ConnectionIds[connectId] = connectId
+    peers_Connection[connectId] = peerConnection
 
     if (videoState == videoStates.Camera || videoState == videoStates.Screen) {
       if (webcamTracks) {
+        console.log("added to track");
         updateMediaSenders(webcamTracks, rtp_video_senders);
       }
     }
 
-    peers_ConnectionIds[connectId] = connectId;
-    peers_Connection[connectId] = peerConnection;
-
-    return peerConnection;
+    return peerConnection
   } catch (error) {
     console.log(error);
   }
@@ -195,12 +204,12 @@ const createConnection = async (connectId) => {
 
 const createOffer = async (connectId) => {
   try {
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
+    const offer = await peers_Connection[connectId].createOffer();
+    await peers_Connection[connectId].setLocalDescription(offer);
 
     serverProcess(
       JSON.stringify({
-        offer: peerConnection.localDescription,
+        offer: peers_Connection[connectId].localDescription,
       }),
       connectId
     );
@@ -245,9 +254,6 @@ const clientProcess = async (message, from_connectId) => {
         await createConnection(from_connectId);
       }
       try {
-        console.log("peer",peers_Connection[from_connectId]);
-        console.log("ice",message.icecandidate);
-
         peers_Connection[from_connectId].addIceCandidate(message.icecandidate);
       } catch (error) {
         console.log(error);
@@ -293,7 +299,6 @@ const videoProcess = async (newVideoState) => {
     }
   } catch (error) {
     console.log(error)
-    return
   }
 };
 
@@ -302,7 +307,7 @@ const videoProcess = async (newVideoState) => {
 
 const updateMediaSenders = async (track, rtp_senders) => {
   try {
-    for (let id in peers_Connection) {
+    for (let id in peers_ConnectionIds) {
       if (checkConnection(peers_Connection[id])) {
         if (rtp_senders[id] && rtp_senders[id].track) {
           rtp_senders[id].replaceTrack(track);
