@@ -52,7 +52,28 @@ io.on("connection", (socket) => {
     });
 
     socket.emit("inform_me_about_others", otherPeers);
+
+    socket.on("disconnect",()=>{
+      console.log(socket.id + "disconnect");
+      let disconnectPeer = allConnections.find(p => p.connectId == socket.id)
+
+      if(disconnectPeer){
+        let roomId = disconnectPeer.roomId
+        allConnections = allConnections.filter(p => p.connectId != socket.id)
+
+        let list = allConnections.filter(p => p.roomId == roomId)
+
+        list.forEach( p => {
+          socket.to(p.connectId).emit('infrom_about_connection_end',{
+            connectId:socket.id
+          } )
+        })
+      }
+      
+    })
   });
+
+
 });
 
 server.listen(port, () => {

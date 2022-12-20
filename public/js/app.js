@@ -3,6 +3,9 @@
 const ICE = {
   iceServers: [
     {
+      urls:['stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302']
+    },
+    {
       urls: "stun:relay.metered.ca:80",
     },
     {
@@ -78,6 +81,11 @@ const init = ()=>{
       console.log(error);
     }
   })
+
+  socket.on('infrom_about_connection_end', (data)=>{
+    document.getElementById(data.connectId).remove()
+    closeConnection(data.connectId)
+  })
   
   //-----"RECEIVE"  answer||offer||ICE from the server-------
 
@@ -110,9 +118,10 @@ init()
 const addPeer = (displayName, connectId) => {
   const divText = `<video class="remoteVideoPlayer" id="v_${connectId}" autoplay playsinline muted></video>
                   <p>${displayName}</p>
-                  <audio id="a_${connectId}" muted autoplay></audio>`;
+                  <audio id="a_${connectId}" autoplay></audio>`;
   const videoDiv = document.createElement("div");
-  videoDiv.classList.add("remoteVideo");
+  videoDiv.setAttribute('id',connectId)
+  videoDiv.classList.add("remoteVideo")
   videoDiv.innerHTML = divText;
   videoContainer.append(videoDiv);
   videoDiv.addEventListener("click", () => {
@@ -187,7 +196,13 @@ const createConnection = async (connectId) => {
 
     if (videoState == videoStates.Camera || videoState == videoStates.Screen) {
       if (webcamTracks) {
-        updateMediaSenders(webcamTracks, rtp_video_senders);
+        updateMediaSenders(webcamTracks, rtp_video_senders)
+      }
+    }
+
+    if(!muted){
+      if(audio){
+        updateMediaSenders(audio, rtp_audio_senders)
       }
     }
 
@@ -229,16 +244,16 @@ const clientProcess = async (message, from_connectId) => {
         peers_Connection[from_connectId].setRemoteDescription(message.answer)
       }
     } else if (message.offer) { //OFFER
-      // if(!peers_Connection[from_connectId]){
-      //   await createConnection(from_connectId)
-      // }
+      if(!peers_Connection[from_connectId]){
+        await createConnection(from_connectId)
+      }
 
       await peers_Connection[from_connectId].setRemoteDescription(
         message.offer
       );
-      // if (!peers_Connection[from_connectId]) {
-      //   await createConnection(from_connectId);
-      // }
+      if (!peers_Connection[from_connectId]) {
+        await createConnection(from_connectId);
+      }
       const answer = await peers_Connection[from_connectId].createAnswer();
       await peers_Connection[from_connectId].setLocalDescription(answer);
 
@@ -249,9 +264,9 @@ const clientProcess = async (message, from_connectId) => {
         from_connectId
       );
     } else if (message.icecandidate) { //ICECANDIDATE
-      // if (!peers_Connection[from_connectId]) {
-      //   await createConnection(from_connectId);
-      // }
+      if (!peers_Connection[from_connectId]) {
+        await createConnection(from_connectId);
+      }
       try {
         peers_Connection[from_connectId].addIceCandidate(message.icecandidate);
       } catch (error) {
@@ -265,14 +280,55 @@ const clientProcess = async (message, from_connectId) => {
 
 // ==========================================================================================
 
-// ==================================VIDEO STREAM============================================
+// ==================================HANDLE STREAM============================================
+
+const removeMediaSenders = (rtp_senders)=>{
+  for(let id in peers_ConnectionIds){
+    if(rtp_senders[id] && checkConnection(peers_Connection[id])){
+      peers_Connection[id].removeTrack(rtp_senders[id])
+      rtp_senders[id] = null 
+    }
+  }
+}
+
+
+const removeVidStream = (rtp_video_senders)=>{
+  if(webcamTracks){
+    webcamTracks.stop()
+    webcamTracks = null
+    localVideoPlayer.srcObject = null
+    removeMediaSenders(rtp_video_senders)
+  }  
+}
+
+const loadAudio = async()=>{
+  try {
+    let localAudioStream = await navigator.mediaDevices.getUserMedia({
+      video: false,
+      audio: true,
+    })
+
+    audio = localAudioStream.getAudioTracks()[0]
+    audio.enabled = false
+
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 
 //-------------Add local video to the DOM----------
 
 const videoProcess = async (newVideoState) => {
-  let localVideoStream = null;
+  if(newVideoState == videoStates.None){
+    videoState = newVideoState
+
+    removeVidStream(rtp_video_senders)
+    return
+  }
+
   try {
+    let localVideoStream = null
     if (newVideoState == videoStates.Camera) {
       localVideoStream = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -391,3 +447,28 @@ screenButton.addEventListener("click", async () => {
 
 
 // ==========================================================================================
+
+
+const closeConnection = async(connectId)=>{
+  peers_ConnectionIds[connectId] =null
+  if(peers_Connection[connectId]){
+    peers_Connection[connectId].close()
+    peers_Connection[connectId] = null
+  }
+
+  if(remoteAudStream[connectId]){
+    remoteAudStream[connectId].getTrack().forEach( t => {
+      t.stop()
+    })
+
+    remoteAudStream[connectId] = null
+  }
+
+  if(remoteVidStream[connectId]){
+    remoteVidStream[connectId].getTrack().forEach( t => {
+      t.stop()
+    })
+
+    remoteVidStream[connectId] = null
+  }
+}
