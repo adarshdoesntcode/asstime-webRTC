@@ -172,7 +172,6 @@ const handleICE = ({ candidate, from }) => {
 
 
 const handleDisconnect = (connectId)=> {
-  peers[connectId].close();
   delete peers[connectId];
   document.getElementById(connectId).remove();
 };

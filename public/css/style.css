@@ -102,7 +102,7 @@ p{
   .remoteVideoPlayer{
     border-radius: 0.8rem;
     margin: 1.4rem 1.4rem 0 0;
-    width: 85vw;
+    width: 80vw;
     height: 70vh;
     object-fit: cover;
     transform: scaleX(-1);
