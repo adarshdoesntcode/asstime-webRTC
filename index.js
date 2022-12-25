@@ -56,9 +56,19 @@ io.on("connection", (socket) => {
 
   socket.on('ice-candidate', ({ idtoSend, candidate }) => {
     io.to(idtoSend).emit('ice-candidate', { candidate, from: socket.id });
-});
+  });
 
+  socket.on('disconnecting', () => {
+    socket.rooms.forEach(room => {
+        socket.to(room).emit('user_disconnected', socket.id);
+    });
+  }); 
 
+  socket.on("leave_room",()=>{
+    socket.rooms.forEach(room => {
+      socket.to(room).emit('user_disconnected', socket.id);
+  });
+  })
 });
 
 server.listen(port, () => {
